@@ -1,0 +1,14 @@
+sudo nano /etc/hosts
+-----------------------------
+cd etc 
+sudo nano slurmdbd.conf
+------------------------------------
+cd /etc/mysql/mariadb.conf.d
+sudo nano 50-server.cnf
+-------------------------------------
+cd ..
+sudo nano debian.cnf
+-------------------------------------------
+scontrol update Nodename=compute state=idle
+
+scontrol update Nodename=controller state=idle

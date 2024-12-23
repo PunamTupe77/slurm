@@ -1,0 +1,104 @@
+***********************print any bash file*************************
+#!/bin/bash
+#SBATCH  --output=hello.sh_j%.out
+#SBATCH --error=hello.sh_j%.err
+ech 'hello'
+ chmod +x hello.sh
+*************** create row per node *************************
+1. to check cpu,memory,node,state of node
+   #sinfo -o "%n %c %m %E" --controller/compute
+2. to check row per partition
+   #sinfo -o " %p %a %l %D %c" --compute/controller
+
+********************create row per  node ************
+#!/bin/bash
+echo "NodeName,CPU,Memory State"
+for node in $(sinfo -N -h awk '(print $1]'); do
+cpu_info=$(scontrol show node Snode grep "CPUs="
+mem_info=$(scontrol show node $node I grep "Realmemory="
+state_info=$(scontrol show node $node I grep "State=",
+cpus=$(echo $cpu. info I awk -F '=' '(print $2)' I awk '[print $1]')
+memory=$(echo $men_info - awk -F '=' '(print $2)" awk '(print $1)")
+state-$(echo $state_info awk -F '=' '(print $2)')
+echo "$node,$cpu,$memory,$state"
+done
+
+******************** crete row per partition *********************
+#!/bin/bash
+echo "Partition ,Availability,Nodes,CPUs,Memory,State"
+for partition in $(sinfo -h -o "%P" uniq); do
+availability=$(sinfo -h -p spartitton -o "%A" I uniq
+nodes=$(sinfo-h -p Spartition -o "%N" |wC -l)
+cpus-$(sinfo -h -p $partitton -o "%c" awk 'fsun += $1] END [print sun)
+S
+menory-$(sinfo -h -p $partition -o "%m" I awk '(sum += $1) END (print sum)')
+state=$(sinfo -h -p $partitton -o "%t"|uniq
+echo "$partition,$availability,$nodes,$cpus,$memory,$state"
+done
+
+*******************************************************************************************
+
+1. check nodes are idle,down,drained (nte)
+sinfo -o "%N %T %e"
+n=nodename
+T=down,alloc,idle
+e=down,drained
+
+*******************************************************************************************
+1. show pending jobs
+squeue --state=Pd (sueue -t PENDING)
+squeue --state=R (squeue -t RUNNING)
+squeue --state=completed
+squeue -user=dhpcsa (show all jobs of user )
+****************************************************************************************
+1. get detail info about job
+sacct -j 22
+sacct -j 22 --formate=JobID,State,ExitCode,Partition,JobName
+
+*****************************************************************************************
+1. run job on specific node 
+sbatch --nodelist=compute1 hello.sh
+
+2. run job on specific time
+sbtach --time=30:0:00 hello.sh
+
+*******************************************************************************************
+1. cancle pending ,running job
+scancel --state=PENDING
+scancel --state=RUNNING
+
+*******************************************************************************************
+
+1. craete partition 
+
+PartitionName=exam Nodes=compute1 Default=YES MaxTime=7-00:10:00 State=UP AllowAccounts=ALL
+copy file in /etc/slurm and slurm-llnl >>> controller
+copy file in /etc/slurm and slurm-llnl >>> compute
+
+******************************************************************************************
+1. add ccount  and user also submit job by specifying name
+
+sudo sacctmgr add account exam_account
+sudo sacctmgr add user newexamuser account=exam_account
+sbatch --account=exam_account job_script.sh
+sacctmgr show account
+sacctmgr show user
+
+*******************************************************************************************
+1. check resources of compute before submit job
+sinfo -p compute
+
+2. run job for 0min nd need 2cpu 4gb memory
+srun --partition=short --time=00:30:00 --cpus-per-task=2 --mem=4G --pty bash
+
+*******************************************************************************************
+
+1. see which nodes in the "compute" partition are available (idle and not allocated)
+sinfo -p compute -t idle
+
+2. check the resource usage (e.g., memory, CPU) of all nodes in the
+sstat --allnodes -p compute
+
+3. monitor the progress of a specific
+a)squeue -j 12345
+b)scontrol show job 1234
